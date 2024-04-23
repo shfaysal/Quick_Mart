@@ -18,7 +18,7 @@ interface Api {
     ): Products
 
     @POST("/products/add")
-    suspend fun postProducts(
+    suspend fun postProduct(
         @Body product: Product
     ): Product
 
