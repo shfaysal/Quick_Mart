@@ -7,22 +7,21 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
 
-class UserRepositoryImplementation (
-    private val dao: UserDao,
+class UserInfoGetRepositoryImplementation(
+    private val dao : UserDao,
     private val user: User
-) : UserRepository {
-    override suspend fun postUserDetail(): Flow<Result<Boolean>> {
+) : UserInfoGetRepository {
+    override suspend fun getUserDetail(): Flow<Result<User>> {
         return flow {
-             try {
-                 dao.upsertUser(user)
-            } catch (e: IOException) {
+            val userDetails = try {
+                 dao.getUser()
+            }catch (e: IOException) {
                 e.printStackTrace()
-                emit(Result.Error(message = e.toString()))
+                emit(Result.Error(message = "something wrong here"))
                 return@flow
             }
 
-            emit(Result.Success(true))
+            emit(Result.Success(userDetails))
         }
     }
-
 }
