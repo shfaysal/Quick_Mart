@@ -1,6 +1,5 @@
 package com.example.quickmart.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quickmart.data.Result
@@ -39,7 +38,6 @@ class UserInfoGetViewModel (
 //                                Log.d("TAG",user.name)
                                 user
                             }
-
                         }
                     }
                 }
