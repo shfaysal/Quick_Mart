@@ -1,5 +1,8 @@
 package com.example.quickmart.screen
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.service.autofill.UserData
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -30,31 +33,45 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.quickmart.ImagePicker
+import com.example.quickmart.data.database.UserDatabase
 import com.example.quickmart.data.models.User
+import com.example.quickmart.presentation.UserInfoGetViewModel
+import com.example.quickmart.presentation.UserInfoGetViewModelFactory
 import com.example.quickmart.presentation.UserViewModel
 import com.example.quickmart.presentation.UserViewModelFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import okhttp3.internal.userAgent
 import java.io.File
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun UserDetails(){
 
     val context = LocalContext.current
 
-    val user = User(0,"sazzad","mobile","dd","male",23,"sd","dsdf")
+//    val user = User(0,"sazzad","mobile","dd","male",23,"sd","dsdf")
 
-
-    val viewModel : UserViewModel = viewModel(
-        factory = UserViewModelFactory(context, user)
+    val viewModel1 : UserInfoGetViewModel = viewModel(
+        factory = UserInfoGetViewModelFactory(context)
     )
 
-    val responseUser = viewModel.response.collectAsState().value
+    val userdetails = viewModel1.userDetails.collectAsState().value
 
-    LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
+//    Log.d("TAG", userdetails!!.name)
 
-        viewModel.showErrorToastChannel.collectLatest { show ->
-            if (!show) {
+    if (userdetails != null) {
+        Log.d("TAG",userdetails.name)
+    }
+
+
+    LaunchedEffect(key1 = viewModel1.showErrorTestChannel) {
+
+        viewModel1.showErrorTestChannel.collectLatest {show ->
+            if(!show) {
                 Toast.makeText(
                     context, "Data Loaded Unsuccessful", Toast.LENGTH_SHORT
                 ).show()
@@ -62,44 +79,64 @@ fun UserDetails(){
         }
     }
 
-    if (responseUser) {
-        Toast.makeText(
-            context, "Data Loaded successful", Toast.LENGTH_SHORT
-        ).show()
-    }
+//    var userdetails : User? = null
+//
+//
+//    GlobalScope.launch(Dispatchers.IO) {
+//         userdetails = UserDatabase.getDatabase(context).userDao().getUser()
+//    }
 
 
 
 
-    var name by remember {
-        mutableStateOf("")
-    }
 
-    var mobile by remember {
-        mutableStateOf("")
-    }
 
-    var address by remember {
-        mutableStateOf("")
-    }
 
-    var gender by remember {
-        mutableStateOf("")
-    }
+//    if (userdetails!!.name.equals(null)){
+//        userdetails = user
+//    }
+//
+//    val userdetails = user
+//
+//    val userdetails = user
 
-    var age by remember {
-        mutableStateOf("")
-    }
 
-    var birthDate by remember {
-        mutableStateOf("")
+
+    val id = 1
+
+
+
+
+    var name by remember { mutableStateOf("") }
+
+    var mobile by remember { mutableStateOf("") }
+
+    var address by remember { mutableStateOf("") }
+
+    var gender by remember { mutableStateOf("") }
+
+    var age by remember { mutableStateOf("") }
+
+    var birthDate by remember { mutableStateOf("") }
+
+    userdetails?.let {
+        name = userdetails.name ?: ""
+        mobile = userdetails.mobile ?: ""
+        address = userdetails.address ?: ""
+        gender = userdetails.gender ?: ""
+        age = userdetails.age?.toString() ?: ""
+        birthDate = userdetails.birthdate ?: ""
     }
 
     var image = remember {
         mutableStateOf("")
     }
 
-    var clickdAddPhoto by remember {
+    var clickedAddPhoto by remember {
+        mutableStateOf(false)
+    }
+
+    var isUpdateButtonClicked by remember {
         mutableStateOf(false)
     }
 
@@ -110,7 +147,7 @@ fun UserDetails(){
             .padding(5.dp)
 
     ) {
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(58.dp))
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
@@ -135,8 +172,8 @@ fun UserDetails(){
             label = { Text(text = "Enter Your Address")}
         )
 
-
         Spacer(modifier = Modifier.height(5.dp))
+
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = age,
@@ -168,24 +205,69 @@ fun UserDetails(){
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                clickdAddPhoto = true
+                clickedAddPhoto = true
             }
         ) {
             Text(text = "Add Photo")
         }
 
-        if (clickdAddPhoto) {
+        if (clickedAddPhoto) {
             image.value = ImagePicker()
             Log.d("TAG1", image.value)
-            clickdAddPhoto = false
+            clickedAddPhoto = false
         }
 
         if(image.value != "") {
             Image(painter = rememberAsyncImagePainter(File(context.filesDir,image.value)),
                 contentDescription = null)
         }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                isUpdateButtonClicked = true
+            }
+        ) {
+            Text(text = "Update")
+        }
+    }
+
+    if (isUpdateButtonClicked) {
+        UpLoadUser(context = context, user = User(0,"sazzad","mobile","dd","male",23,"sd","dsdf"))
+        Log.d("TAG","Upload User")
+        isUpdateButtonClicked = false
+    }
+
+}
+
+@Composable
+fun UpLoadUser(context: Context, user: User) {
+
+    val viewModel : UserViewModel = viewModel(
+        factory = UserViewModelFactory(context, user)
+    )
+
+    val responseUser = viewModel.response.collectAsState().value
+
+    LaunchedEffect(key1 = viewModel.showErrorToastChannel) {
+
+        viewModel.showErrorToastChannel.collectLatest { show ->
+            if (!show) {
+                Toast.makeText(
+                    context, "Data uploaded Unsuccessful", Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    if (responseUser) {
+        Toast.makeText(
+            context, "Data uploaded successful", Toast.LENGTH_SHORT
+        ).show()
     }
 }
+
+
 
 
 

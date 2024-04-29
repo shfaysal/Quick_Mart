@@ -9,11 +9,10 @@ import com.example.quickmart.data.repositories.UserInfoGetRepositoryImplementati
 
 class UserInfoGetViewModelFactory (
     private val context: Context,
-    private val user: User
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return UserInfoGetViewModel(UserInfoGetRepositoryImplementation(UserDatabase.getDatabase(context).userDao(), user))
+        return UserInfoGetViewModel(UserInfoGetRepositoryImplementation(UserDatabase.getDatabase(context).userDao()))
                 as T
     }
 }

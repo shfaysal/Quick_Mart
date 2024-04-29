@@ -11,7 +11,7 @@ interface UserDao {
     @Upsert
     suspend fun upsertUser(user: User)
 
-    @Upsert
-    @Query("SELECT * FROM User")
+//    @Upsert
+    @Query("SELECT * FROM User WHERE id==1")
     suspend fun getUser(): User
 }

@@ -1,5 +1,6 @@
 package com.example.quickmart.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quickmart.data.Result
@@ -17,7 +18,7 @@ class UserInfoGetViewModel (
     private val userInfoGetRepository: UserInfoGetRepository
 ) : ViewModel() {
 
-    private val _userDetails = MutableStateFlow<User?> (null)
+    private val _userDetails = MutableStateFlow<User?>(null)
     val userDetails = _userDetails.asStateFlow()
 
     private val _showErrorTestChannel = Channel<Boolean>()
@@ -35,13 +36,13 @@ class UserInfoGetViewModel (
                     is Result.Success -> {
                         result.data?.let {user ->
                             _userDetails.update {
+//                                Log.d("TAG",user.name)
                                 user
                             }
 
                         }
                     }
                 }
-
             }
         }
     }
