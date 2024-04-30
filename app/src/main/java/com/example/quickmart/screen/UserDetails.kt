@@ -53,6 +53,7 @@ fun UserDetails(){
 
     val context = LocalContext.current
 
+
 //    val user = User(0,"sazzad","mobile","dd","male",23,"sd","dsdf")
 
     val viewModel1 : UserInfoGetViewModel = viewModel(
@@ -63,9 +64,9 @@ fun UserDetails(){
 
 //    Log.d("TAG", userdetails!!.name)
 
-    if (userdetails != null) {
-        Log.d("TAG",userdetails.name)
-    }
+//    if (userdetails != null) {
+//        Log.d("TAG",userdetails.name)
+//    }
 
 
     LaunchedEffect(key1 = viewModel1.showErrorTestChannel) {
@@ -106,7 +107,9 @@ fun UserDetails(){
 
 
 
-
+    var isFirst by remember {
+        mutableStateOf(true)
+    }
     var name by remember { mutableStateOf("") }
 
     var mobile by remember { mutableStateOf("") }
@@ -119,14 +122,19 @@ fun UserDetails(){
 
     var birthDate by remember { mutableStateOf("") }
 
-    userdetails?.let {
-        name = userdetails.name ?: ""
-        mobile = userdetails.mobile ?: ""
-        address = userdetails.address ?: ""
-        gender = userdetails.gender ?: ""
-        age = userdetails.age?.toString() ?: ""
-        birthDate = userdetails.birthdate ?: ""
+
+    if(isFirst) {
+        userdetails?.let {
+            name = userdetails.name
+            mobile = userdetails.mobile
+            address = userdetails.address
+            gender = userdetails.gender
+            age = userdetails.age.toString()
+            birthDate = userdetails.birthdate
+        }
+        Log.d("COUNT","$isFirst")
     }
+
 
     var image = remember {
         mutableStateOf("")
@@ -152,7 +160,10 @@ fun UserDetails(){
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = name,
-            onValueChange = {name = it},
+            onValueChange = {
+                name = it
+                isFirst = false
+                            },
             label = { Text(text = "Enter Your name")}
         )
 
@@ -160,7 +171,10 @@ fun UserDetails(){
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = mobile,
-            onValueChange = {mobile = it},
+            onValueChange = {
+                mobile = it
+                isFirst = false
+                            },
             label = { Text(text = "Enter Your Mobile Number")}
         )
 
@@ -177,7 +191,10 @@ fun UserDetails(){
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = age,
-            onValueChange = {age = it},
+            onValueChange = {
+                age = it
+                isFirst = false
+                            },
             label = { Text(text = "Enter Your Age")},
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal
@@ -189,7 +206,10 @@ fun UserDetails(){
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = gender,
-            onValueChange = {gender = it},
+            onValueChange = {
+                gender = it
+                isFirst = false
+                            },
             label = { Text(text = "Enter Your Gender")}
         )
 
@@ -197,7 +217,10 @@ fun UserDetails(){
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = birthDate,
-            onValueChange = {birthDate = it},
+            onValueChange = {
+                birthDate = it
+                isFirst = false
+                            },
             label = { Text(text = "Enter Your Birth-Date")}
         )
 
@@ -233,7 +256,7 @@ fun UserDetails(){
     }
 
     if (isUpdateButtonClicked) {
-        UpLoadUser(context = context, user = User(0,"sazzad","mobile","dd","male",23,"sd","dsdf"))
+        UpLoadUser(context = context, user = User(userdetails!!.id,name,mobile,address,gender,age.toInt(),birthDate,"no photo"))
         Log.d("TAG","Upload User")
         isUpdateButtonClicked = false
     }
