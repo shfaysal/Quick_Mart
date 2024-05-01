@@ -7,16 +7,18 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import java.util.UUID
 
 
 @Composable
-fun ImagePicker() : String{
-    val pickedImage = remember {
-        mutableStateOf("")
+fun ImagePicker() : Uri{
+    var pickedImage by remember {
+        mutableStateOf<Uri?>(null)
     }
 
     val context = LocalContext.current
@@ -30,8 +32,8 @@ fun ImagePicker() : String{
 //        }
     ) {uri: Uri? ->
         uri?.let {
-            pickedImage.value = saveImageToInterStorage(context, it)
-            Log.d("TAG5",pickedImage.value)
+            pickedImage = it
+//            Log.d("TAG5",pickedImage)
         }
     }
 
@@ -40,21 +42,34 @@ fun ImagePicker() : String{
 //        contentDescription = null
 //    )
 
-    if(pickedImage.value.isEmpty()) {
-        SideEffect {
-            getContent.launch("image/*")
-//            return@SideEffect
-        }
-    }
+//    if(pickedImage.isEmpty()) {
+//        SideEffect {
+//            getContent.launch("image/*")
+////            return@SideEffect
+//        }
+//    }
 
-    Log.d("TAG1",pickedImage.value)
+//    Log.d("TAG1",pickedImage)
 
-    return pickedImage.value
+    return pickedImage!!
 }
 
-fun saveImageToInterStorage(context: Context, uri: Uri): String {
+//@Composable
+//fun PickImage() : Uri {
+//    var selectedImageUri by remember {
+//        mutableStateOf<Uri?>(null)
+//    }
+//
+//    val photoPickerLauncher = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.PickVisualMedia(),
+//        onResult = { uri  -> selectedImageUri = uri})
+//
+//
+//}
+
+fun saveImageToInterStorage(context: Context, uri: Uri?): String {
     val fileName = UUID.randomUUID().toString() + ".jpg"
-    val inputStream = context.contentResolver.openInputStream(uri)
+    val inputStream = context.contentResolver.openInputStream(uri!!)
     val outputStream = context.openFileOutput(fileName, Context.MODE_PRIVATE)
 
     inputStream?.use {input ->

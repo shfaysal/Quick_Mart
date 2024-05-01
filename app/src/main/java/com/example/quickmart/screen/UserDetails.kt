@@ -2,17 +2,24 @@ package com.example.quickmart.screen
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.service.autofill.UserData
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -26,11 +33,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.quickmart.ImagePicker
 import com.example.quickmart.data.database.UserDatabase
@@ -39,6 +48,7 @@ import com.example.quickmart.presentation.UserInfoGetViewModel
 import com.example.quickmart.presentation.UserInfoGetViewModelFactory
 import com.example.quickmart.presentation.UserViewModel
 import com.example.quickmart.presentation.UserViewModelFactory
+import com.example.quickmart.saveImageToInterStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -122,6 +132,12 @@ fun UserDetails(){
 
     var birthDate by remember { mutableStateOf("") }
 
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri -> selectedImageUri = uri})
+
 
     if(isFirst) {
         userdetails?.let {
@@ -152,7 +168,8 @@ fun UserDetails(){
     Column (
         modifier = Modifier
             .fillMaxSize()
-            .padding(5.dp)
+            .padding(10.dp)
+            .verticalScroll(rememberScrollState())
 
     ) {
         Spacer(modifier = Modifier.height(58.dp))
@@ -228,22 +245,39 @@ fun UserDetails(){
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
+                photoPickerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
                 clickedAddPhoto = true
             }
         ) {
             Text(text = "Add Photo")
         }
 
-        if (clickedAddPhoto) {
-            image.value = ImagePicker()
-            Log.d("TAG1", image.value)
-            clickedAddPhoto = false
+
+//        if (clickedAddPhoto) {
+//             image.value = saveImageToInterStorage(context, selectedImageUri)
+//            Log.d("TAG1", image.value)
+//            clickedAddPhoto = false
+//        }
+
+//        if(image.value != "") {
+//            Image(painter = rememberAsyncImagePainter(File(context.filesDir,image.value)),
+//                contentDescription = null)
+//        }
+
+
+        if (selectedImageUri != null) {
+            AsyncImage(
+                model = selectedImageUri,
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
         }
 
-        if(image.value != "") {
-            Image(painter = rememberAsyncImagePainter(File(context.filesDir,image.value)),
-                contentDescription = null)
-        }
 
         Button(
             modifier = Modifier.fillMaxWidth(),
@@ -253,6 +287,8 @@ fun UserDetails(){
         ) {
             Text(text = "Update")
         }
+
+        Spacer(modifier = Modifier.height(80.dp))
     }
 
     if (isUpdateButtonClicked) {
