@@ -2,15 +2,15 @@ package com.example.quickmart.screen
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
-import android.service.autofill.UserData
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,21 +23,28 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
@@ -54,8 +61,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.internal.userAgent
 import java.io.File
+import java.io.InputStream
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -113,12 +122,12 @@ fun UserDetails(){
 
 
 
-    val id = 1
-
-
 
     var isFirst by remember {
         mutableStateOf(true)
+    }
+    var id by remember {
+        mutableIntStateOf(0)
     }
     var name by remember { mutableStateOf("") }
 
@@ -128,11 +137,15 @@ fun UserDetails(){
 
     var gender by remember { mutableStateOf("") }
 
-    var age by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("0") }
 
     var birthDate by remember { mutableStateOf("") }
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    var image by remember { mutableStateOf<ImageBitmap?>(null) }
+
+    var upDateOrUploadButton by remember { mutableStateOf("UpLoad") }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -141,20 +154,20 @@ fun UserDetails(){
 
     if(isFirst) {
         userdetails?.let {
+            id = userdetails.id
             name = userdetails.name
             mobile = userdetails.mobile
             address = userdetails.address
             gender = userdetails.gender
             age = userdetails.age.toString()
             birthDate = userdetails.birthdate
+            selectedImageUri = userdetails.photo.toUri()
+            upDateOrUploadButton = "UpDate"
         }
         Log.d("COUNT","$isFirst")
+        Log.d("URI", selectedImageUri.toString())
     }
 
-
-    var image = remember {
-        mutableStateOf("")
-    }
 
     var clickedAddPhoto by remember {
         mutableStateOf(false)
@@ -163,6 +176,8 @@ fun UserDetails(){
     var isUpdateButtonClicked by remember {
         mutableStateOf(false)
     }
+
+
 
 
     Column (
@@ -211,7 +226,7 @@ fun UserDetails(){
             onValueChange = {
                 age = it
                 isFirst = false
-                            },
+                },
             label = { Text(text = "Enter Your Age")},
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal
@@ -249,10 +264,28 @@ fun UserDetails(){
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 )
                 clickedAddPhoto = true
+                isFirst = false
             }
         ) {
             Text(text = "Add Photo")
         }
+
+
+        if (selectedImageUri != null) {
+            AsyncImage(
+                model = selectedImageUri,
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.Fit
+            )
+//            LoadImageFromUri(uri = selectedImageUri.toString(), context = context)
+
+            Spacer(modifier = Modifier.height(5.dp))
+        }
+
+//        Image(
+//            painter = Painter()
+//        )
 
 
 //        if (clickedAddPhoto) {
@@ -267,16 +300,46 @@ fun UserDetails(){
 //        }
 
 
-        if (selectedImageUri != null) {
-            AsyncImage(
-                model = selectedImageUri,
-                contentDescription = null,
-                modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.Crop
-            )
+//        if (clickedAddPhoto and (selectedImageUri != null)) {
+//            image = saveImageToInterStorage(context,selectedImageUri)
+//            Log.d("TAG", image!!)
+//            clickedAddPhoto = false
+//        }
+//
+////            )
+//
+//        if (selectedImageUri != null){
+//
+//
+//        Image(
+//                painter = rememberAsyncImagePainter(File(context.filesDir, image)),
+//                contentDescription = null
+//            )
+//            Log.d("IMAGEN", image!!)
+//        //            AsyncImage(
+////                model = selectedImageUri,
+////                contentDescription = null,
+////                modifier = Modifier.fillMaxWidth(),
+////                contentScale = ContentScale.Crop
+//
+////            Log.d("URI",selectedImageUri.toString())
+//
+//            Spacer(modifier = Modifier.height(50.dp))
+//        }
 
-            Spacer(modifier = Modifier.height(5.dp))
-        }
+//        if (selectedImageUri != null) {
+//            AsyncImage(
+//                model = selectedImageUri,
+//                contentDescription = null,
+//                modifier = Modifier.fillMaxWidth(),
+//                contentScale = ContentScale.Crop
+//            )
+//
+////            Log.d("URI",selectedImageUri.toString())
+//
+//                Spacer(modifier = Modifier.height(5.dp))
+//        }
+
 
 
         Button(
@@ -285,14 +348,14 @@ fun UserDetails(){
                 isUpdateButtonClicked = true
             }
         ) {
-            Text(text = "Update")
+            Text(text = upDateOrUploadButton)
         }
 
         Spacer(modifier = Modifier.height(80.dp))
     }
 
     if (isUpdateButtonClicked) {
-        UpLoadUser(context = context, user = User(userdetails!!.id,name,mobile,address,gender,age.toInt(),birthDate,"no photo"))
+        UpLoadUser(context = context, user = User(id,name,mobile,address,gender,age.toInt(),birthDate,selectedImageUri.toString()))
         Log.d("TAG","Upload User")
         isUpdateButtonClicked = false
     }
@@ -326,12 +389,50 @@ fun UpLoadUser(context: Context, user: User) {
     }
 }
 
-
-
+//@Composable
+//fun LoadImageFromUri(uri: String , context: Context) {
+//    val imageBitmap = remember { mutableStateOf<ImageBitmap?>(null) }
+////    val context = LocalContext.current
+//    val coroutineScope = rememberCoroutineScope()
+//
+//    val loadBitmap: suspend () -> Unit = {
+//        val inputStream: InputStream? = context.contentResolver.openInputStream(uri.toUri())
+//        if (inputStream != null) {
+//            val bitmap = BitmapFactory.decodeStream(inputStream)
+//            val imageBitmapValue = withContext(Dispatchers.Default) {
+//                bitmap.asImageBitmap()
+//            }
+//            imageBitmap.value = imageBitmapValue
+//        }
+//    }
+//
+//    DisposableEffect(uri) {
+//        coroutineScope.launch {
+//            loadBitmap()
+//        }
+//
+//        onDispose {
+//            // Cleanup
+//            imageBitmap.value = null
+//        }
+//    }
+//
+//    imageBitmap.value?.let { Image(bitmap = it, contentDescription = "Loaded Image") }
+//}
 
 
 @Preview(showBackground = true)
 @Composable
 fun UserDetailPreview(){
     UserDetails()
+}
+
+private suspend fun loadImage(context: Context, uri: String, bitmapState: MutableState<ImageBitmap?>) {
+    withContext(Dispatchers.IO) {
+        val inputStream: InputStream? = context.contentResolver.openInputStream(Uri.parse(uri))
+        if (inputStream != null) {
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            bitmapState.value = bitmap.asImageBitmap()
+        }
+    }
 }

@@ -116,6 +116,8 @@ fun SearchBarHandle(onSearchTextChange :   (String) -> Unit) {
     var text by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
 
+
+
     SearchBar(
         modifier = Modifier.fillMaxWidth(),
         query = text,
