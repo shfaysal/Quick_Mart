@@ -1,9 +1,11 @@
 package com.example.quickmart.screen
 
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -77,19 +81,19 @@ fun Home(){
             items(productList.size){index ->
                 Product(productList[index])
                 Spacer(Modifier.height(16.dp))
-
             }
-
         }
     }
-
 }
 
 @Composable
 fun Product( product : Product){
+
     val imageStage = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(LocalContext.current).data(product.thumbnail)
-            .size(Size.ORIGINAL).build()
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(product.thumbnail)
+            .size(Size.ORIGINAL)
+            .build()
     ).state
 
     Column (
@@ -98,6 +102,9 @@ fun Product( product : Product){
             .height(300.dp)
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primaryContainer)
+            .clickable {
+                Log.d("CLICKED","Clicked on ${product.title}")
+            }
     ) {
 
         if (imageStage is AsyncImagePainter.State.Error) {
@@ -127,11 +134,10 @@ fun Product( product : Product){
         Text(
             text = "${product.title} -- Price: ${product.price}$",
             fontSize =  17.sp,
-//            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center
         )
     }
-
-
 }
 
 

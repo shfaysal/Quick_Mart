@@ -20,7 +20,7 @@ class PostProductViewModel(
 
 
     private val _product = MutableStateFlow<Product>(Product("sazzad","sazzad","sdsdfs",10.9,3,
-        listOf("sdfsdfs","sdsf"),23,34.3,3,"sfdsfd","sdfsfd"))
+        listOf("sdfsdfs","sdsf"),34.3,34.3,3,"sfdsfd","sdfsfd"))
     val product = _product.asStateFlow()
 
     private val _showErrorToastChannel = Channel<Boolean>()

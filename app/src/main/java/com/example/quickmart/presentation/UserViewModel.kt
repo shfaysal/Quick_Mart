@@ -1,5 +1,6 @@
 package com.example.quickmart.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quickmart.data.Result
@@ -25,6 +26,7 @@ class UserViewModel (
     init {
         viewModelScope.launch {
             userRepository.postUserDetail().collectLatest { result ->
+                Log.d("TAG","$result")
                 when(result) {
                     is Result.Error -> {
                         _showErrorToastChannel.send(false)

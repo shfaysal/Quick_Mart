@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+<!--    we store at cache-->
+    <cache-path
+        android:name="temp_images"
+        android:path="images/" />
+
+</paths>

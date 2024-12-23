@@ -3,11 +3,13 @@ package com.example.quickmart.screen
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -31,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.quickmart.MyImageArea
 import com.example.quickmart.presentation.ProductViewModelFactory
 import com.example.quickmart.presentation.SearchProductViewModel
 import com.example.quickmart.presentation.SearchViewModelFactory
@@ -47,24 +50,35 @@ fun SearchProducts(){
         factory = SearchViewModelFactory(text)
     )
 
-    Scaffold(
-        topBar = {
-            SearchBarHandle(
-                onSearchTextChange = {searchText ->
-//                    viewModel = viewModel(
-//                        factory = ProductViewModelFactory(searchText)
-//                    )
+//    Scaffold(
+//        topBar = {
+//            SearchBarHandle(
+//                onSearchTextChange = {searchText ->
+////                    viewModel = viewModel(
+////                        factory = ProductViewModelFactory(searchText)
+////                    )
+//
+//                    text = searchText
+//
+//                }
+//            )
+//        },
+//        content = { paddingValues ->
+//            val value = paddingValues
+//            SearchProducts(viewModel)
+//        }
+//    )
 
-                    text = searchText
+    Column (
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp)
+    ) {
 
-                }
-            )
-        },
-        content = { paddingValues ->
-            val value = paddingValues
-            SearchProducts(viewModel)
-        }
-    )
+        Spacer(modifier = Modifier.height(30.dp))
+        MyImageArea()
+
+    }
 
 }
 
@@ -86,25 +100,26 @@ fun SearchProducts(viewModel: SearchProductViewModel){
         }
     }
 
-    if (searchProductList.isEmpty()){
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ){
-            CircularProgressIndicator()
-        }
-    }else {
-        LazyColumn (
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = PaddingValues(16.dp)
-        ) {
-            items(searchProductList.size) {index ->
-                Product(searchProductList[index])
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-        }
-    }
+
+//    if (searchProductList.isEmpty()){
+//        Box(
+//            modifier = Modifier.fillMaxSize(),
+//            contentAlignment = Alignment.Center
+//        ){
+//            CircularProgressIndicator()
+//        }
+//    }else {
+//        LazyColumn (
+//            modifier = Modifier.fillMaxSize(),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            contentPadding = PaddingValues(16.dp)
+//        ) {
+//            items(searchProductList.size) {index ->
+//                Product(searchProductList[index])
+//                Spacer(modifier = Modifier.height(16.dp))
+//            }
+//        }
+//    }
 }
 
 

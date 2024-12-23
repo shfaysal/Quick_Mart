@@ -15,5 +15,5 @@ data class User(
     val gender: String,
     val age: Int,
     val birthdate: String,
-    val photo: String
+    val photo: ByteArray
 )

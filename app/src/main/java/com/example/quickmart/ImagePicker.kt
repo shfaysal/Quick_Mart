@@ -1,17 +1,19 @@
 package com.example.quickmart
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import java.io.ByteArrayOutputStream
 import java.util.UUID
 
 
@@ -68,6 +70,7 @@ fun ImagePicker() : Uri{
 //}
 
 fun saveImageToInterStorage(context: Context, uri: Uri?): String {
+
     val fileName = UUID.randomUUID().toString() + ".jpg"
     val inputStream = context.contentResolver.openInputStream(uri!!)
     val outputStream = context.openFileOutput(fileName, Context.MODE_PRIVATE)
@@ -79,4 +82,25 @@ fun saveImageToInterStorage(context: Context, uri: Uri?): String {
     }
 
     return fileName
+}
+
+
+fun uriToBitmap(uri: Uri, context: Context) : Bitmap? {
+    return try {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        BitmapFactory.decodeStream(inputStream)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
+
+fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+    val stream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+    return stream.toByteArray()
+}
+
+fun byteArrayToBitmap(byteArray: ByteArray): Bitmap {
+    return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
 }

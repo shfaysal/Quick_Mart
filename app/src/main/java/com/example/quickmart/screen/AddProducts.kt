@@ -317,7 +317,7 @@ fun AddProducts(){
 
     if (uploadButton){
         val response = PostProduct(Product(brandName,category,description,discountPercentage.toDouble(),id.toInt(),
-            listOf("slkfdsldf","slkdjslfk"),price.toInt(),rating.toDouble(),stock.toInt(),selectedImageUri.toString(),title))
+            listOf("slkfdsldf","slkdjslfk"),price.toDouble(),rating.toDouble(),stock.toInt(),selectedImageUri.toString(),title))
 
         uploadButton = !uploadButton
 
