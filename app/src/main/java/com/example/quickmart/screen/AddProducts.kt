@@ -316,8 +316,7 @@ fun AddProducts(){
     }
 
     if (uploadButton){
-        val response = PostProduct(Product(brandName,category,description,discountPercentage.toDouble(),id.toInt(),
-            listOf("slkfdsldf","slkdjslfk"),price.toDouble(),rating.toDouble(),stock.toInt(),selectedImageUri.toString(),title))
+        val response = PostProduct(Product.EMPTY)
 
         uploadButton = !uploadButton
 
@@ -334,6 +333,7 @@ fun AddProducts(){
 
 @Composable
 fun PostProduct(product: Product): Product {
+
     val viewModel : PostProductViewModel = viewModel(
         factory = PostProductViewModelFactory(product)
     )

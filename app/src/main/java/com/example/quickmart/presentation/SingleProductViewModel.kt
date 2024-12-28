@@ -1,11 +1,10 @@
 package com.example.quickmart.presentation
 
-import android.text.BoringLayout
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quickmart.data.Result
 import com.example.quickmart.data.models.Product
-import com.example.quickmart.data.repositories.PostProductRepository
+import com.example.quickmart.data.repositories.SingleProductRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,10 +13,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class PostProductViewModel(
-    private val postProductRepository: PostProductRepository,
+class SingleProductViewModel(
+    private val singleProductRepository: SingleProductRepository
 ) : ViewModel() {
-
 
     private val _product = MutableStateFlow<Product>(Product.EMPTY)
     val product = _product.asStateFlow()
@@ -27,16 +25,17 @@ class PostProductViewModel(
 
     init {
         viewModelScope.launch {
-            postProductRepository.postProduct().collectLatest { result ->
-                when(result) {
+            singleProductRepository.getSingleProduct().collectLatest { result ->
+                when(result){
                     is Result.Error -> {
                         _showErrorToastChannel.send(false)
                     }
                     is Result.Success -> {
-                        result.data?.let {product ->
+                        result.data?.let { product ->
                             _product.update {
                                 product
                             }
+
                         }
                     }
                 }

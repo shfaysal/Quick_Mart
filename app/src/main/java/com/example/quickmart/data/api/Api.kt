@@ -5,6 +5,7 @@ import com.example.quickmart.data.models.Products
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface Api {
@@ -21,6 +22,11 @@ interface Api {
     suspend fun postProduct(
         @Body product: Product
     ): Product
+
+    @GET("/products/{id}")
+    suspend fun getProductById(
+        @Path("id") id : Int
+    ) : Product
 
     companion object {
         const val BASE_URL = "https://dummyjson.com/"

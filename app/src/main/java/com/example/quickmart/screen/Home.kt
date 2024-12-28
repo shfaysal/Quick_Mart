@@ -1,5 +1,6 @@
 package com.example.quickmart.screen
 
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -34,6 +35,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -42,9 +44,11 @@ import com.example.quickmart.data.models.Product
 import com.example.quickmart.presentation.ProductViewModel
 import com.example.quickmart.presentation.ProductViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Composable
-fun Home(){
+fun Home(navController: NavController){
 
     val viewModel : ProductViewModel = viewModel(
         factory = ProductViewModelFactory()
@@ -79,7 +83,7 @@ fun Home(){
         ) {
 
             items(productList.size){index ->
-                Product(productList[index])
+                Product(productList[index], navController)
                 Spacer(Modifier.height(16.dp))
             }
         }
@@ -87,7 +91,9 @@ fun Home(){
 }
 
 @Composable
-fun Product( product : Product){
+fun Product( product : Product, navController: NavController){
+
+
 
     val imageStage = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
@@ -103,7 +109,13 @@ fun Product( product : Product){
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primaryContainer)
             .clickable {
-                Log.d("CLICKED","Clicked on ${product.title}")
+                try {
+//                    val productJson = Uri.encode(Json.encodeToString(product))
+//                    Log.d("CLICKED", "Clicked on ${product.title}")
+                    navController.navigate(Screen.ProductDetails.withArgs(product.id.toString()))
+                }catch (e: Exception){
+                    Log.d("JSON ERROR", e.message.toString())
+                }
             }
     ) {
 
@@ -139,5 +151,3 @@ fun Product( product : Product){
         )
     }
 }
-
-

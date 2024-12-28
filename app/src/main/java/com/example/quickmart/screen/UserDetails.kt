@@ -56,21 +56,13 @@ import coil.request.ImageRequest
 import com.example.quickmart.ImagePicker
 import com.example.quickmart.bitmapToByteArray
 import com.example.quickmart.byteArrayToBitmap
-import com.example.quickmart.data.database.UserDatabase
 import com.example.quickmart.data.models.User
 import com.example.quickmart.presentation.UserInfoGetViewModel
 import com.example.quickmart.presentation.UserInfoGetViewModelFactory
 import com.example.quickmart.presentation.UserViewModel
 import com.example.quickmart.presentation.UserViewModelFactory
-import com.example.quickmart.saveImageToInterStorage
 import com.example.quickmart.uriToBitmap
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.internal.userAgent
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -378,10 +370,10 @@ fun UserDetails() {
 //
 //                Spacer(modifier = Modifier.height(5.dp))
 //        }
-
-
-
         }
+
+
+
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
@@ -414,7 +406,7 @@ fun UserDetails() {
                     selectedImageUri!!
                 )
             )
-            Log.d("TAG", "Upload User")
+            Log.d("TAG", "Upload User $selectedImageUri")
             isUpdateButtonClicked = false
         }
 
