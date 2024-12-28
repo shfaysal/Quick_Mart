@@ -56,6 +56,7 @@ import coil.request.ImageRequest
 import com.example.quickmart.ImagePicker
 import com.example.quickmart.bitmapToByteArray
 import com.example.quickmart.byteArrayToBitmap
+import com.example.quickmart.data.database.UserDatabase
 import com.example.quickmart.data.models.User
 import com.example.quickmart.presentation.UserInfoGetViewModel
 import com.example.quickmart.presentation.UserInfoGetViewModelFactory

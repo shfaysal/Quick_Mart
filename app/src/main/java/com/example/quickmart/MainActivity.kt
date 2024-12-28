@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
@@ -127,6 +128,7 @@ class MainActivity : ComponentActivity() {
                             },
                             bottomBar = {
                                 BottomBarBody(
+//                                    modifier = Modifier.height(40.dp),
                                     items = NavigationItemList.bottomBarItemList,
                                     onItemClick = {item ->
                                         Log.d("TAG","${item.title} is clicked")

@@ -3,6 +3,7 @@ package com.example.quickmart.screen
 import android.util.Log
 import android.widget.Space
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,12 +22,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
@@ -34,9 +37,9 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,8 +47,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,8 +62,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -214,24 +213,26 @@ fun ProductDetails(id : String?){
                     .align(Alignment.TopCenter)
                     .verticalScroll(rememberScrollState())
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp),
-                    contentAlignment = Alignment.Center
-                ){
-                    if (imageState is AsyncImagePainter.State.Success){
-                        Image(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            painter = imageState.painter,
-                            contentDescription = null,
-                            contentScale = ContentScale.FillBounds
-                        )
-                    } else {
-                        CircularProgressIndicator()
-                    }
-                }
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(300.dp),
+//                    contentAlignment = Alignment.Center
+//                ){
+//                    if (imageState is AsyncImagePainter.State.Success){
+//                        Image(
+//                            modifier = Modifier
+//                                .fillMaxSize(),
+//                            painter = imageState.painter,
+//                            contentDescription = null,
+//                            contentScale = ContentScale.FillBounds
+//                        )
+//                    } else {
+//                        CircularProgressIndicator()
+//                    }
+//                }
+
+                ImageCarousel(images = response.images)
 
 
                 Box(
@@ -287,8 +288,14 @@ fun ProductDetails(id : String?){
                         }
 
                         Text(
-                            modifier = Modifier.padding(startPadding),
+                            modifier = Modifier.padding(start = startPadding, top = 2.dp, bottom = 2.dp),
                             text = response.title,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.W600
+                        )
+                        Text(
+                            modifier = Modifier.padding(start = startPadding),
+                            text = "Brand Name : ${response.brand}",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.W600
                         )
@@ -330,7 +337,7 @@ fun ProductDetails(id : String?){
                                 modalStateValue = 0
                                 showBottomSheet = true
                             })
-                            RowOfDetailsPage(R.drawable.warranty, "Warranty", onClick = {
+                            RowOfDetailsPage(R.drawable.warranty, response.warrantyInformation, onClick = {
                                 scope.launch {
                                     sheetState.show()
                                 }
@@ -480,26 +487,36 @@ fun ProductDetails(id : String?){
                 }
 
 
-                Spacer(modifier = Modifier.height(100.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
             }
 
             Box(
                 modifier = Modifier
-                    .height(50.dp)
+//                    .height(50.dp)
                     .fillMaxWidth()
-                    .background(backGroundColor)
+                    .padding(end = 20.dp, bottom = 5.dp)
+                    .background(Color.Transparent)
                     .align(Alignment.BottomCenter),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.CenterEnd
             ){
-                Row(
-//                    modifier = Modifier.background(Color.Gray),
-                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                FloatingActionButton(
+                    containerColor = Color(0xFF32CD32),
+                    contentColor = Color.White,
+                    onClick = {
 
-                ) {
-                    BuyAndAddButton("Buy Now")
-                    BuyAndAddButton("Add To Cart")
+                }) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(40.dp))
+
                 }
+//                Row(
+////                    modifier = Modifier.background(Color.Gray),
+//                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+//
+//                ) {
+//                    BuyAndAddButton("Buy Now")
+//                    BuyAndAddButton("Add To Cart")
+//                }
 
             }
         }
@@ -519,7 +536,7 @@ fun ProductDetails(id : String?){
             if (modalStateValue==0){
 
                 CustomModalBottomSheetForReturn(
-                    text = response.warrantyInformation,
+                    text = response.returnPolicy,
                     onClick = {
                         scope.launch {
                             sheetState.hide() // Dismiss the bottom sheet on request
@@ -551,9 +568,96 @@ fun ProductDetails(id : String?){
             }
         }
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ImageCarousel(images : List<String>){
+
+    val pagerState = rememberPagerState( pageCount = {
+        images.size
+    })
+
+    Box(
+        modifier = Modifier
+            .height(300.dp)
+            .fillMaxWidth()
+            .background(Color(0xF5F5F5F5))
+            .padding(10.dp)
+    ){
+        HorizontalPager(
+            state = pagerState,
+            beyondBoundsPageCount = 3,
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+        ) { page ->
+
+            val imageState = rememberAsyncImagePainter(
+                model = ImageRequest
+                    .Builder(LocalContext.current)
+                    .data(images[page])
+                    .crossfade(true)
+                    .size(Size.ORIGINAL)
+                    .build()
+            ).state
 
 
+            Box(modifier = Modifier
+                .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
 
+                when(imageState){
+                    is AsyncImagePainter.State.Success -> {
+                        Image(
+                            painter = imageState.painter,
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit
+                        )
+                    }
+                    else -> {
+                        CircularProgressIndicator()
+                    }
+                }
+
+            }
+        }
+
+        Row (
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(10.dp)
+        ) {
+            images.indices.forEach { index ->
+                IconButton(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier.size(10.dp)
+                ){
+
+                    val color = if ( index == pagerState.currentPage) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(5.dp)
+//                            .padding(4.dp)
+                            .background(color, shape = CircleShape)
+                    )
+                    
+                }
+
+            }
+
+        }
+
+
+    }
+
+
+    
 }
 
 
@@ -754,7 +858,7 @@ fun RowOfDetailsPage(icon : Int, text : String, onClick: () -> Unit){
 fun CustomModalBottomSheetForReturn(text: String, onClick: () -> Unit){
 
     Box(modifier = Modifier
-        .height(200.dp)
+        .height(220.dp)
         .fillMaxWidth()
         .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
 //        .background(Color.White)
@@ -1009,6 +1113,11 @@ fun CommentCard(review: Review){
 @Composable
 fun PreviewProductDetails(){
 //    CommentCard()
+//    ImageCarousel(images = listOf(
+//        "https://cdn.dummyjson.com/products/images/fragrances/Gucci%20Bloom%20Eau%20de/1.png",
+//        "https://cdn.dummyjson.com/products/images/fragrances/Gucci%20Bloom%20Eau%20de/2.png",
+//        "https://cdn.dummyjson.com/products/images/fragrances/Gucci%20Bloom%20Eau%20de/3.png"
+//    ))
     ProductDetails(id = "2")
 //    ModalBottomSheet()
 //    VoucherCard(backGroundColor = Color.Green, spend = "", discount = "")

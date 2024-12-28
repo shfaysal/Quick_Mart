@@ -6,6 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -38,10 +40,13 @@ fun BottomBarBody (
         mutableIntStateOf(0)
     }
 
+    val CustomGreen = Color(0xFF32CD32)
 
-        NavigationBar {
+
+        NavigationBar() {
             items.forEachIndexed { index, item ->
                 NavigationBarItem(
+//                    modifier = Modifier.padding(horizontal = 10.dp),
                     selected = selectedItemIndex == index,
                     onClick = {
                         selectedItemIndex = index
@@ -49,8 +54,9 @@ fun BottomBarBody (
                     },
                     label = {
                         Text(
+//                            modifier = Modifier.padding(top = 5.dp),
                             text = item.title,
-                            fontSize = 20.sp,
+                            fontSize = 14.sp,
                             fontWeight = if (index == selectedItemIndex){
                                 FontWeight.Bold
                             } else {
@@ -60,6 +66,7 @@ fun BottomBarBody (
                     },
                     icon = {
                         Icon(
+                            modifier = Modifier.size(24.dp),
                             imageVector = if (index == selectedItemIndex) {
                                 item.selectIcon
                             }else {
@@ -73,10 +80,12 @@ fun BottomBarBody (
 //                            }
                         )
                     },
-//                    colors = NavigationBarItemDefaults.colors(
+                    colors = NavigationBarItemDefaults.colors(
 //                        selectedIconColor = Color.Green,
-//                        unselectedIconColor = Color.White
-//                    )
+//                        unselectedIconColor = Color.White,
+                        indicatorColor = CustomGreen
+                    )
+
                 )
         }
 
